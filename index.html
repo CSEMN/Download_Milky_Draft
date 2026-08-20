@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta property="og:image" content="https://csemn.github.io/DownloadAWR/assets/new_app_icon-min_x25.png" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنزيل تطبيق سجل الاوزان بصيغة APK</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font (Inter) */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light blue-gray background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Custom animation for button hover */
+        .download-button {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .download-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
+        }
+
+        .download-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- Main Download Card -->
+    <div id="app-card" class="bg-white rounded-2xl shadow-2xl p-6 sm:p-10 max-w-lg w-full text-center transform transition duration-500 hover:scale-[1.01]">
+        
+        <!-- App Icon Placeholder -->
+        <div class="mx-auto w-24 h-24 sm:w-32 sm:h-32 rounded-3xl flex items-center justify-center shadow-xl mb-6">
+            <img src="./assets/new_app_icon-min_x25.png" alt="App Icon" >
+        </div>
+
+        <!-- App Details -->
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">سجل الاوزان</h1>
+        <p class="text-lg text-gray-500 mb-6">حساب و مشاركة الاوزان بسهولة</p>
+
+        <!-- Metadata Table (Responsive Flex Layout) -->
+        <div class="flex flex-wrap justify-center  mb-8 p-4 bg-indigo-50 rounded-xl">
+            <div class="m-3 ">
+                <p class="text-sm sm:text-base font-semibold text-gray-700">الإصدار</p>
+                <p id="versionValue" class="text-xl font-bold text-indigo-700">تحميل...</p>
+            </div>
+            <div class="m-3 ">
+                <p class="text-sm sm:text-base font-semibold text-gray-700">الحجم</p>
+                <p id="sizeValue" class="text-xl font-bold text-indigo-700">جاري الحساب...</p>
+            </div>
+            <div class="m-3 ">
+                <p class="text-sm sm:text-base font-semibold text-gray-700">نظام التشغيل</p>
+                <p class="text-xl font-bold text-indigo-700">Android</p>
+            </div>
+        </div>
+
+        <!-- Download Button -->
+        <button 
+            id="downloadBtn"
+            class="download-button w-full py-4 bg-green-500 text-white font-bold text-xl rounded-xl shadow-lg transition duration-300 ease-in-out hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 focus:ring-opacity-75 flex items-center justify-center space-x-3 rtl:space-x-reverse">
+            <!-- Download Icon -->
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+            </svg>
+            <span>تنزيل ملف APK</span>
+        </button>
+
+
+        <!-- Security and Info section -->
+        <div class="mt-8 text-right p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <h3 class="text-sm font-semibold text-gray-800 flex items-center justify-start mb-2">
+                تحذير التثبيت
+                <svg class="w-4 h-4 ml-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+            </h3>
+            <p class="text-xs text-gray-600">
+                قد تحتاج إلى تفعيل "التثبيت من مصادر غير معروفة" في إعدادات جهازك لتثبيت ملف APK هذا. هذا الملف موثوق ومستضاف بشكل آمن.
+            </p>
+        </div>
+        
+        <!-- Status Message Box (hidden by default) -->
+        <div id="statusMessage" class="mt-6 p-3 rounded-xl hidden" role="alert">
+            <!-- Content will be injected by JavaScript -->
+        </div>
+
+    </div>
+
+    <script>
+        // DOM element references
+        const statusMessage = document.getElementById('statusMessage');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const versionValue = document.getElementById('versionValue');
+        const sizeValue = document.getElementById('sizeValue');
+
+        let apkFileName = `AWR-${versionValue.textContent}.apk`;
+        let apkSizeBytes = 0;
+        const apkFolder = './assets/';
+        const versionFileUrl = './version.html';
+
+        /**
+         * Converts file size from MB to a human-readable string.
+         * @param {number} sizeMB - Size in megabytes.
+         * @returns {string} Human-readable size string.
+         */
+        function formatSize(sizeMB) {
+            if (sizeMB < 1) return (sizeMB * 1024).toFixed(2) + ' KB';
+            return sizeMB.toFixed(1) + ' MB';
+        }
+
+        /**
+         * Converts bytes to a human-readable string.
+         * @param {number} bytes - Size in bytes.
+         * @returns {string} Human-readable size string.
+         */
+        function formatSizeBytes(bytes) {
+            if (!bytes || Number.isNaN(bytes)) return 'غير معروف';
+            const sizeMB = bytes / 1024 / 1024;
+            return formatSize(sizeMB);
+        }
+
+        /**
+         * Displays a status message to the user instead of using alert().
+         * @param {string} message - The message to display.
+         * @param {string} type - 'success', 'info', or 'error' for styling.
+         */
+        function showStatus(message, type) {
+            let baseClasses = 'text-right font-medium transition-all duration-300 ';
+            let styleClasses = '';
+
+            switch (type) {
+                case 'success':
+                    styleClasses = 'bg-green-100 text-green-800 border-r-4 border-green-500';
+                    break;
+                case 'info':
+                    styleClasses = 'bg-blue-100 text-blue-800 border-r-4 border-blue-500';
+                    break;
+                case 'error':
+                    styleClasses = 'bg-red-100 text-red-800 border-r-4 border-red-500';
+                    break;
+                default:
+                    styleClasses = 'bg-gray-100 text-gray-800 border-r-4 border-gray-500';
+            }
+
+            statusMessage.className = `mt-6 p-3 rounded-xl ${baseClasses} ${styleClasses}`;
+            statusMessage.innerHTML = message;
+            statusMessage.classList.remove('hidden');
+        }
+
+        function updateDownloadButtonLabel(label = 'تنزيل ملف APK') {
+            downloadBtn.innerHTML = `
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                <span>${label}</span>
+            `;
+        }
+
+        async function fetchText(url) {
+            const response = await fetch(url, { cache: 'no-cache' });
+            if (!response.ok) throw new Error(`Failed to load ${url}: ${response.status}`);
+            return response.text();
+        }
+
+        async function fetchContentLength(url) {
+            try {
+                const headResponse = await fetch(url, { method: 'HEAD', cache: 'no-cache' });
+                const contentLength = headResponse.headers.get('content-length');
+                if (contentLength) return Number(contentLength);
+            } catch (error) {
+                console.warn('HEAD request failed, falling back to GET for size detection.', error);
+            }
+
+            try {
+                const getResponse = await fetch(url, { method: 'GET', cache: 'no-cache' });
+                const contentLength = getResponse.headers.get('content-length');
+                if (contentLength) return Number(contentLength);
+            } catch (error) {
+                console.warn('GET request failed while detecting file size.', error);
+            }
+
+            return undefined;
+        }
+
+        async function loadVersionAndSize() {
+            try {
+                const versionText = await fetchText(versionFileUrl);
+                const version = versionText.trim().split('\n')[0].trim();
+                if (version) {
+                    versionValue.textContent = version;
+                    apkFileName = `AWR-${version}.apk`;
+                } else {
+                    versionValue.textContent = 'غير متوفر';
+                }
+            } catch (error) {
+                console.error('Unable to load version file:', error);
+                versionValue.textContent = 'فشل التحميل';
+            }
+
+            const apkUrl = `${apkFolder}${apkFileName}`;
+            const bytes = await fetchContentLength(apkUrl);
+            apkSizeBytes = bytes || 0;
+            sizeValue.textContent = bytes ? formatSizeBytes(bytes) : 'غير معروف';
+
+            if (!bytes) {
+                showStatus('لم نتمكن من حساب حجم الملف تلقائيًا. حاول التنزيل لمعرفة الحجم الفعلي.', 'info');
+            }
+        }
+
+        function startDownload() {
+            const fileName = apkFileName;
+            const sizeLabel = apkSizeBytes ? formatSizeBytes(apkSizeBytes) : 'حجم غير معروف';
+
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white rtl:ml-3 rtl:-mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>جارٍ إعداد التنزيل...</span>
+            `;
+
+            const infoMessage = `بدء تنزيل <strong>${fileName}</strong> (${sizeLabel}) تلقائيًا. تحقق من التنزيلات في متصفحك.`;
+            showStatus(infoMessage, 'info');
+
+            setTimeout(() => {
+                try {
+                    const link = document.createElement('a');
+                    link.href = `${apkFolder}${fileName}`;
+                    link.download = fileName;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+
+                    showStatus(`بدأ تنزيل <strong>${fileName}</strong> بنجاح!`, 'success');
+                } catch (error) {
+                    console.error('Download simulation failed:', error);
+                    showStatus('حدث خطأ أثناء بدء التنزيل. الرجاء المحاولة مرة أخرى.', 'error');
+                } finally {
+                    setTimeout(() => {
+                        downloadBtn.disabled = false;
+                        updateDownloadButtonLabel();
+                    }, 3000);
+                }
+            }, 1500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            statusMessage.classList.add('hidden');
+            downloadBtn.addEventListener('click', startDownload);
+            updateDownloadButtonLabel();
+            loadVersionAndSize();
+        });
+    </script>
+</body>
+</html>
