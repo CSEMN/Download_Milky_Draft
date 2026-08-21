@@ -105,7 +105,7 @@
         const versionValue = document.getElementById('versionValue');
         const sizeValue = document.getElementById('sizeValue');
 
-        let apkFileName = `milky-draft-${versionValue.textContent}.apk`;
+        let apkFileName = `milky-draft-v${versionValue.textContent}.apk`;
         let apkSizeBytes = 0;
         const apkFolder = './assets/';
         const versionFileUrl = './version.html';
@@ -200,7 +200,7 @@
                 const version = versionText.trim().split('\n')[0].trim();
                 if (version) {
                     versionValue.textContent = version;
-                    apkFileName = `milky-draft-${version}.apk`;
+                    apkFileName = `milky-draft-v${version}.apk`;
                 } else {
                     versionValue.textContent = 'غير متوفر';
                 }
