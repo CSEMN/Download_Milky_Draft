@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta property="og:image" content="https://csemn.github.io/DownloadAWR/assets/new_app_icon-min_x25.png" />
+    <meta property="og:image" content="https://csemn.github.io/Download_Milky_Draft/assets/logo.png" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تنزيل تطبيق سجل الاوزان بصيغة APK</title>
+    <title>تنزيل تطبيق سجل اللبن بصيغة APK</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -43,12 +43,12 @@
         
         <!-- App Icon Placeholder -->
         <div class="mx-auto w-24 h-24 sm:w-32 sm:h-32 rounded-3xl flex items-center justify-center shadow-xl mb-6">
-            <img src="./assets/new_app_icon-min_x25.png" alt="App Icon" >
+            <img src="./assets/logo.png" alt="App Icon" >
         </div>
 
         <!-- App Details -->
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">سجل الاوزان</h1>
-        <p class="text-lg text-gray-500 mb-6">حساب و مشاركة الاوزان بسهولة</p>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-2">سجل اللبن</h1>
+        <p class="text-lg text-gray-500 mb-6">حساب و مشاركة سجلات اللبن بسهولة</p>
 
         <!-- Metadata Table (Responsive Flex Layout) -->
         <div class="flex flex-wrap justify-center  mb-8 p-4 bg-indigo-50 rounded-xl">
@@ -105,7 +105,7 @@
         const versionValue = document.getElementById('versionValue');
         const sizeValue = document.getElementById('sizeValue');
 
-        let apkFileName = `AWR-${versionValue.textContent}.apk`;
+        let apkFileName = `milky-draft-${versionValue.textContent}.apk`;
         let apkSizeBytes = 0;
         const apkFolder = './assets/';
         const versionFileUrl = './version.html';
@@ -200,7 +200,7 @@
                 const version = versionText.trim().split('\n')[0].trim();
                 if (version) {
                     versionValue.textContent = version;
-                    apkFileName = `AWR-${version}.apk`;
+                    apkFileName = `milky-draft-${version}.apk`;
                 } else {
                     versionValue.textContent = 'غير متوفر';
                 }
